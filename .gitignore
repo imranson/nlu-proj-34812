@@ -1,5 +1,5 @@
 .DS_Store
 /training_data/
-/predictions/
+/predictions.csv/
 /downloads/
 /trial_data/
