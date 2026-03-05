@@ -1,5 +1,3 @@
-"""Augment AV training data by swapping text_1 and text_2, retaining labels."""
-
 import argparse
 import pandas as pd
 
