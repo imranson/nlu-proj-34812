@@ -1,5 +1,8 @@
 .DS_Store
-/training_data/
+/training_data/*
+!/training_data/.gitkeep
 /predictions.csv/
-/downloads/
-/trial_data/
+/downloads/*
+!/downloads/.gitkeep
+/trial_data/*
+!/trial_data/.gitkeep
