@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import numpy as np
 import pandas as pd
@@ -145,7 +146,11 @@ def train(args):
     else:
         scaler = None
 
+    model_short = args.model_name.split("/")[-1]
+    ckpt_name = f"{model_short}_lr{args.lr}_bs{args.batch_size}_ep{args.epochs}_ml{args.max_length}_m{args.margin}_wd{args.weight_decay}"
+
     best_f1 = 0
+    history = []
     for epoch in range(1, args.epochs + 1):
         model.train()
         running_loss = 0
@@ -182,30 +187,55 @@ def train(args):
                 avg = running_loss / step
                 print(f"  Epoch {epoch} | Step {step}/{len(train_loader)} | Loss {avg:.4f}")
 
-        # Validation
-        metrics = evaluate(model, dev_loader, device)
+        train_loss = running_loss / len(train_loader)
+        train_metrics = evaluate(model, train_loader, device)
+        val_metrics = evaluate(model, dev_loader, device)
+
+        history.append({
+            "epoch": epoch,
+            "train_loss": train_loss,
+            "train_f1": train_metrics["f1"],
+            "train_accuracy": train_metrics["accuracy"],
+            "train_auc": train_metrics["auc"],
+            "val_f1": val_metrics["f1"],
+            "val_accuracy": val_metrics["accuracy"],
+            "val_auc": val_metrics["auc"],
+            "val_threshold": val_metrics["threshold"],
+        })
+
         print(
-            f"Epoch {epoch} — Val F1: {metrics['f1']:.4f} | "
-            f"Acc: {metrics['accuracy']:.4f} | AUC: {metrics['auc']:.4f} | "
-            f"Threshold: {metrics['threshold']:.4f}"
+            f"Epoch {epoch} — "
+            f"Train Loss: {train_loss:.4f} | Train F1: {train_metrics['f1']:.4f} | "
+            f"Val F1: {val_metrics['f1']:.4f} | "
+            f"Acc: {val_metrics['accuracy']:.4f} | AUC: {val_metrics['auc']:.4f} | "
+            f"Threshold: {val_metrics['threshold']:.4f}"
         )
 
-        if metrics["f1"] > best_f1:
-            best_f1 = metrics["f1"]
+        if val_metrics["f1"] > best_f1:
+            best_f1 = val_metrics["f1"]
             os.makedirs(args.output_dir, exist_ok=True)
-            save_path = os.path.join(args.output_dir, "best_model.pt")
+            save_path = os.path.join(args.output_dir, f"{ckpt_name}.pt")
             torch.save(
                 {
                     "model_state_dict": model.state_dict(),
-                    "threshold": metrics["threshold"],
-                    "f1": metrics["f1"],
+                    "threshold": val_metrics["threshold"],
+                    "f1": val_metrics["f1"],
                     "epoch": epoch,
                 },
                 save_path,
             )
             print(f"  ✓ Saved best model (F1={best_f1:.4f}) → {save_path}")
 
+    results_path = os.path.join(args.output_dir, f"{ckpt_name}_results.json")
+    results = {
+        "best_f1": best_f1,
+        "history": history,
+        "config": vars(args),
+    }
+    with open(results_path, "w") as f:
+        json.dump(results, f, indent=2)
     print(f"\nTraining complete. Best val F1: {best_f1:.4f}")
+    print(f"Results saved → {results_path}")
 
 def parse_args():
     p = argparse.ArgumentParser(description="Siamese DeBERTa Authorship Verification")
