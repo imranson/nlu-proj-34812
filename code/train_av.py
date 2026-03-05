@@ -9,6 +9,8 @@ from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModel, get_linear_schedule_with_warmup
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 
+from config import DEFAULTS
+
 
 class AVDataset(Dataset):
     def __init__(self, csv_path, tokenizer, max_length):
@@ -240,26 +242,26 @@ def train(args):
 def parse_args():
     p = argparse.ArgumentParser(description="Siamese DeBERTa Authorship Verification")
 
-    p.add_argument("--train_csv", type=str, default="training_data/AV/train.csv")
-    p.add_argument("--dev_csv", type=str, default="training_data/AV/dev.csv")
+    p.add_argument("--train_csv", type=str, default=DEFAULTS["train_csv"])
+    p.add_argument("--dev_csv", type=str, default=DEFAULTS["dev_csv"])
 
-    p.add_argument("--model_name", type=str, default="microsoft/deberta-v3-large")
-    p.add_argument("--max_length", type=int, default=512)
+    p.add_argument("--model_name", type=str, default=DEFAULTS["model_name"])
+    p.add_argument("--max_length", type=int, default=DEFAULTS["max_length"])
 
-    p.add_argument("--margin", type=float, default=-0.5)
+    p.add_argument("--margin", type=float, default=DEFAULTS["margin"])
 
-    p.add_argument("--epochs", type=int, default=3)
-    p.add_argument("--batch_size", type=int, default=8)
-    p.add_argument("--lr", type=float, default=2e-5)
-    p.add_argument("--weight_decay", type=float, default=0.01)
-    p.add_argument("--warmup_ratio", type=float, default=0.1)
-    p.add_argument("--max_grad_norm", type=float, default=1.0)
-    p.add_argument("--fp16", action="store_true")
+    p.add_argument("--epochs", type=int, default=DEFAULTS["epochs"])
+    p.add_argument("--batch_size", type=int, default=DEFAULTS["batch_size"])
+    p.add_argument("--lr", type=float, default=DEFAULTS["lr"])
+    p.add_argument("--weight_decay", type=float, default=DEFAULTS["weight_decay"])
+    p.add_argument("--warmup_ratio", type=float, default=DEFAULTS["warmup_ratio"])
+    p.add_argument("--max_grad_norm", type=float, default=DEFAULTS["max_grad_norm"])
+    p.add_argument("--fp16", action="store_true", default=DEFAULTS["fp16"])
 
-    p.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
-    p.add_argument("--num_workers", type=int, default=0)
-    p.add_argument("--log_steps", type=int, default=100)
-    p.add_argument("--output_dir", type=str, default="checkpoints/av_siamese")
+    p.add_argument("--device", type=str, default=DEFAULTS["device"])
+    p.add_argument("--num_workers", type=int, default=DEFAULTS["num_workers"])
+    p.add_argument("--log_steps", type=int, default=DEFAULTS["log_steps"])
+    p.add_argument("--output_dir", type=str, default=DEFAULTS["output_dir"])
 
     return p.parse_args()
 
