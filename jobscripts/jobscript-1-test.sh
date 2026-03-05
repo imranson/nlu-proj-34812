@@ -18,7 +18,7 @@ module purge
 conda deactivate
 
 module load libs/cuda
-conda activate semantic-decoding
+conda activate nlu-proj-34812
 
 echo "Job is using $SLURM_GPUS GPU(s) with ID(s) $CUDA_VISIBLE_DEVICES and $SLURM_NTASKS CPU core(s)"
 
