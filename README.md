@@ -1,5 +1,20 @@
 # COMP34812 NLU Coursework
 
+## CSF3 usage tips IMPORTANT
+if below:
+```
+git@github.com: Permission denied (publickey).
+fatal: Could not read from remote repository.
+
+Please make sure you have the correct access rights
+and the repository exists.
+```
+then run
+```
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+```
+
 ## Setup
 
 1. Download the dataset zips and place them in the `downloads/` folder.
