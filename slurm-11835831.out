@@ -1,0 +1,51 @@
+Job is using 1 GPU(s) with ID(s) 0 and 8 CPU core(s)
+torch cuda is available: True
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Could not extract SentencePiece model from /mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.cache/huggingface/hub/models--microsoft--deberta-v3-large/snapshots/64a8c8eab3e352a784c658aef62be1662607476f/spm.model using sentencepiece library due to 
+SentencePieceExtractor requires the SentencePiece library but it was not found in your environment. Check out the instructions on the
+installation page of its repo: https://github.com/google/sentencepiece#installation and follow the ones
+that match your environment. Please note that you may need to restart your runtime after installation.
+. Falling back to TikToken extractor.
+Config: {'train_csv': 'training_data/AV/train.csv', 'dev_csv': 'training_data/AV/dev.csv', 'model_name': 'microsoft/deberta-v3-large', 'max_length': 512, 'margin': -0.5, 'epochs': 32, 'batch_size': 8, 'lr': 2e-05, 'weight_decay': 0.01, 'warmup_ratio': 0.1, 'max_grad_norm': 1.0, 'fp16': False, 'device': 'cuda', 'num_workers': 0, 'log_steps': 100, 'output_dir': 'checkpoints/av_siamese'}
+Traceback (most recent call last):
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/transformers/tokenization_utils_tokenizers.py", line 195, in convert_to_native_format
+    extractor = SentencePieceExtractor(vocab_file)
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/transformers/convert_slow_tokenizer.py", line 152, in __init__
+    requires_backends(self, "sentencepiece")
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/transformers/utils/import_utils.py", line 1930, in requires_backends
+    raise ImportError("".join(failed))
+ImportError: 
+SentencePieceExtractor requires the SentencePiece library but it was not found in your environment. Check out the instructions on the
+installation page of its repo: https://github.com/google/sentencepiece#installation and follow the ones
+that match your environment. Please note that you may need to restart your runtime after installation.
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/transformers/convert_slow_tokenizer.py", line 1898, in extract_vocab_merges_from_model
+    from tiktoken.load import load_tiktoken_bpe
+ModuleNotFoundError: No module named 'tiktoken'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/net/scratch/q12628ct/nlu-proj-34812/code/train_av.py", line 272, in <module>
+    train(args)
+  File "/net/scratch/q12628ct/nlu-proj-34812/code/train_av.py", line 114, in train
+    tokenizer = AutoTokenizer.from_pretrained(args.model_name)
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/transformers/models/auto/tokenization_auto.py", line 773, in from_pretrained
+    return tokenizer_class.from_pretrained(pretrained_model_name_or_path, *inputs, **kwargs)
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/transformers/tokenization_utils_base.py", line 1721, in from_pretrained
+    return cls._from_pretrained(
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/transformers/tokenization_utils_base.py", line 1907, in _from_pretrained
+    init_kwargs = cls.convert_to_native_format(**init_kwargs)
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/transformers/tokenization_utils_tokenizers.py", line 248, in convert_to_native_format
+    local_kwargs["tokenizer_object"] = converter.converted()
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/transformers/convert_slow_tokenizer.py", line 1935, in converted
+    tokenizer = self.tokenizer()
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/transformers/convert_slow_tokenizer.py", line 1928, in tokenizer
+    vocab_scores, merges = self.extract_vocab_merges_from_model(self.vocab_file)
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/transformers/convert_slow_tokenizer.py", line 1900, in extract_vocab_merges_from_model
+    raise ValueError(
+ValueError: `tiktoken` is required to read a `tiktoken` file. Install it with `pip install tiktoken`.
