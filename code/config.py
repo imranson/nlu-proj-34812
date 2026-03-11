@@ -19,7 +19,7 @@ DEFAULTS = {
     "weight_decay": 0.01,
     "warmup_ratio": 0.1,
     "max_grad_norm": 1.0,
-    "fp16": False,
+    "fp16": True,
 
     # runtime
     "device": "cuda" if torch.cuda.is_available() else "cpu",
