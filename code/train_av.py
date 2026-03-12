@@ -130,7 +130,7 @@ def train(args):
         pin_memory=True,
     )
 
-    model = SiameseDeBERTa(args.model_name).to(device)
+    model = SiameseDeBERTa(args.model_name).to(device).float()
     criterion = ContrastiveLoss(margin=args.margin)
 
     optimizer = torch.optim.AdamW(
