@@ -10,7 +10,7 @@ DEFAULTS = {
     "max_length": 512,
 
     # contrastive loss
-    "margin": -0.5,
+    # "margin": 100,
 
     # training
     "epochs": 3,
