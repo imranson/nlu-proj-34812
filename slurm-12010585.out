@@ -1,0 +1,31 @@
+Job is using 1 GPU(s) with ID(s) 0 and 8 CPU core(s)
+torch cuda is available: True
+Config: {'train_csv': 'training_data/AV/train.csv', 'dev_csv': 'training_data/AV/dev.csv', 'model_name': 'microsoft/deberta-v3-large', 'max_length': 512, 'margin': -0.5, 'epochs': 32, 'batch_size': 8, 'lr': 2e-05, 'weight_decay': 0.01, 'warmup_ratio': 0.1, 'max_grad_norm': 1.0, 'fp16': True, 'device': 'cuda', 'num_workers': 0, 'log_steps': 100, 'output_dir': 'checkpoints/av_siamese'}
+Loading weights:   0%|          | 0/390 [00:00<?, ?it/s]Loading weights: 100%|██████████| 390/390 [00:00<00:00, 29047.46it/s]
+[1mDebertaV2Model LOAD REPORT[0m from: microsoft/deberta-v3-large
+Key                                     | Status     |  | 
+----------------------------------------+------------+--+-
+mask_predictions.LayerNorm.weight       | UNEXPECTED |  | 
+lm_predictions.lm_head.bias             | UNEXPECTED |  | 
+mask_predictions.dense.bias             | UNEXPECTED |  | 
+mask_predictions.classifier.weight      | UNEXPECTED |  | 
+mask_predictions.LayerNorm.bias         | UNEXPECTED |  | 
+lm_predictions.lm_head.dense.bias       | UNEXPECTED |  | 
+lm_predictions.lm_head.dense.weight     | UNEXPECTED |  | 
+lm_predictions.lm_head.LayerNorm.weight | UNEXPECTED |  | 
+mask_predictions.dense.weight           | UNEXPECTED |  | 
+mask_predictions.classifier.bias        | UNEXPECTED |  | 
+lm_predictions.lm_head.LayerNorm.bias   | UNEXPECTED |  | 
+
+[3mNotes:
+- UNEXPECTED[3m	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.[0m
+Traceback (most recent call last):
+  File "/net/scratch/q12628ct/nlu-proj-34812/code/train_av.py", line 272, in <module>
+    train(args)
+  File "/net/scratch/q12628ct/nlu-proj-34812/code/train_av.py", line 172, in train
+    scaler.unscale_(optimizer)
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/torch/amp/grad_scaler.py", line 343, in unscale_
+    optimizer_state["found_inf_per_device"] = self._unscale_grads_(
+  File "/mnt/iusers01/fse-ugpgt01/compsci01/q12628ct/.conda/envs/nlu-proj-348/lib/python3.10/site-packages/torch/amp/grad_scaler.py", line 261, in _unscale_grads_
+    raise ValueError("Attempting to unscale FP16 gradients.")
+ValueError: Attempting to unscale FP16 gradients.
