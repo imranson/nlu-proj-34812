@@ -1,25 +1,25 @@
 Job is using 1 GPU(s) with ID(s) 0 and 8 CPU core(s)
 torch cuda is available: True
 Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
-Config: {'train_csv': 'training_data/AV/train.csv', 'dev_csv': 'training_data/AV/dev.csv', 'model_name': 'microsoft/deberta-v3-large', 'max_length': 512, 'margin': -0.5, 'epochs': 32, 'batch_size': 8, 'lr': 2e-05, 'weight_decay': 0.01, 'warmup_ratio': 0.1, 'max_grad_norm': 1.0, 'fp16': True, 'device': 'cuda', 'num_workers': 0, 'log_steps': 100, 'output_dir': 'checkpoints/av_siamese'}
-Loading weights:   0%|          | 0/390 [00:00<?, ?it/s]Loading weights: 100%|██████████| 390/390 [00:00<00:00, 37355.92it/s]
+Config: {'train_csv': 'training_data/AV/train.csv', 'dev_csv': 'training_data/AV/dev.csv', 'model_name': 'microsoft/deberta-v3-large', 'max_length': 256, 'margin': -0.5, 'epochs': 32, 'batch_size': 1, 'lr': 2e-05, 'weight_decay': 0.01, 'warmup_ratio': 0.1, 'max_grad_norm': 1.0, 'fp16': True, 'device': 'cuda', 'num_workers': 0, 'log_steps': 100, 'output_dir': 'checkpoints/av_siamese'}
+Loading weights:   0%|          | 0/390 [00:00<?, ?it/s]Loading weights: 100%|██████████| 390/390 [00:00<00:00, 38187.90it/s]
 [1mDebertaV2Model LOAD REPORT[0m from: microsoft/deberta-v3-large
 Key                                     | Status     |  | 
 ----------------------------------------+------------+--+-
-lm_predictions.lm_head.LayerNorm.weight | UNEXPECTED |  | 
-mask_predictions.LayerNorm.weight       | UNEXPECTED |  | 
-lm_predictions.lm_head.dense.weight     | UNEXPECTED |  | 
-mask_predictions.classifier.weight      | UNEXPECTED |  | 
-lm_predictions.lm_head.bias             | UNEXPECTED |  | 
-mask_predictions.LayerNorm.bias         | UNEXPECTED |  | 
-mask_predictions.dense.weight           | UNEXPECTED |  | 
 mask_predictions.dense.bias             | UNEXPECTED |  | 
+lm_predictions.lm_head.bias             | UNEXPECTED |  | 
 mask_predictions.classifier.bias        | UNEXPECTED |  | 
-lm_predictions.lm_head.LayerNorm.bias   | UNEXPECTED |  | 
+mask_predictions.LayerNorm.weight       | UNEXPECTED |  | 
+mask_predictions.LayerNorm.bias         | UNEXPECTED |  | 
+lm_predictions.lm_head.LayerNorm.weight | UNEXPECTED |  | 
+lm_predictions.lm_head.dense.weight     | UNEXPECTED |  | 
 lm_predictions.lm_head.dense.bias       | UNEXPECTED |  | 
+mask_predictions.dense.weight           | UNEXPECTED |  | 
+lm_predictions.lm_head.LayerNorm.bias   | UNEXPECTED |  | 
+mask_predictions.classifier.weight      | UNEXPECTED |  | 
 
 [3mNotes:
 - UNEXPECTED[3m	:can be ignored when loading from different task/architecture; not ok if you expect identical arch.[0m
 /net/scratch/q12628ct/nlu-proj-34812/code/train_av.py:184: UserWarning: Detected call of `lr_scheduler.step()` before `optimizer.step()`. In PyTorch 1.1.0 and later, you should call them in the opposite order: `optimizer.step()` before `lr_scheduler.step()`.  Failure to do this will result in PyTorch skipping the first value of the learning rate schedule. See more details at https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate
   scheduler.step()
-[2026-03-12T15:26:08.175] error: *** JOB 12031442 ON node848 CANCELLED AT 2026-03-12T15:26:08 DUE to SIGNAL Terminated ***
+[2026-03-12T21:29:20.045] error: *** JOB 12052046 ON node849 CANCELLED AT 2026-03-12T21:29:20 DUE to SIGNAL Terminated ***
