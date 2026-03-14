@@ -20,14 +20,25 @@ from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 
 from config import DEFAULTS
 
-TRAIN_CSV = DEFAULTS['train_csv']
-DEV_CSV = DEFAULTS['dev_csv']
-MODEL_NAME = DEFAULTS['model_name']
-BATCH_SIZE = DEFAULTS['batch_size']
-MAX_LEN = DEFAULTS['max_length']
-LR = DEFAULTS['lr']
-EPOCH = DEFAULTS['epochs']
-DEVICE = DEFAULTS['device']
+parser = argparse.ArgumentParser()
+parser.add_argument("--train_csv", type=str, default=DEFAULTS['train_csv'])
+parser.add_argument("--dev_csv", type=str, default=DEFAULTS['dev_csv'])
+parser.add_argument("--model_name", type=str, default=DEFAULTS['model_name'])
+parser.add_argument("--batch_size", type=int, default=DEFAULTS['batch_size'])
+parser.add_argument("--max_len", type=int, default=DEFAULTS['max_length'])
+parser.add_argument("--lr", type=float, default=DEFAULTS['lr'])
+parser.add_argument("--epochs", type=int, default=DEFAULTS['epochs'])
+parser.add_argument("--device", type=str, default=DEFAULTS['device'])
+args = parser.parse_args()
+
+TRAIN_CSV = args.train_csv
+DEV_CSV = args.dev_csv
+MODEL_NAME = args.model_name
+BATCH_SIZE = args.batch_size
+MAX_LEN = args.max_len
+LR = args.lr
+EPOCH = args.epochs
+DEVICE = args.device
 print(f"TRAIN_CSV={TRAIN_CSV}, DEV_CSV={DEV_CSV}, MODEL_NAME={MODEL_NAME}, BATCH_SIZE={BATCH_SIZE}, MAX_LEN={MAX_LEN}, LR={LR}, EPOCH={EPOCH}, DEVICE={DEVICE}")
 
 train_pd = pd.read_csv(TRAIN_CSV)
