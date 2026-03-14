@@ -6,7 +6,7 @@ DEFAULTS = {
     "dev_csv": "training_data/AV/dev.csv",
 
     # model
-    "model_name": "microsoft/deberta-v3-large",
+    "model_name": "microsoft/deberta-v3-xsmall",
     "max_length": 50,
 
     # contrastive loss
