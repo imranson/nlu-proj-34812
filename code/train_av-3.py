@@ -92,12 +92,11 @@ class CustomBERT(nn.Module):
         bert_cls = self.encode(input_ids, attention_mask)
         return self.classifier(bert_cls)
 
-device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
-print(device)
-model = CustomBERT().to(device)
+print(DEVICE)
+model = CustomBERT().to(DEVICE)
 print(model)
 
-loss_fn = nn.BCEWithLogitsLoss().to(device)
+loss_fn = nn.BCEWithLogitsLoss().to(DEVICE)
 optimizer = torch.optim.AdamW(model.parameters(), lr=LR)
 
 model.to(torch.float32)
@@ -109,9 +108,9 @@ for x in range(EPOCH):
     # 1 epoch
     for batch, batch_items in enumerate(train_dataloader, 1):
         # print("=============", batch*BATCH_SIZE ,'/',len(train_pd), "===============")
-        ids1 = batch_items["input_ids_1"].to(device)
-        mask1 = batch_items["attention_mask_1"].to(device)
-        labels = batch_items["label"].to(device)
+        ids1 = batch_items["input_ids_1"].to(DEVICE)
+        mask1 = batch_items["attention_mask_1"].to(DEVICE)
+        labels = batch_items["label"].to(DEVICE)
         logits = model(ids1, mask1).squeeze(-1)
         loss = loss_fn(logits, labels)
         train_loss += loss.item()
@@ -131,9 +130,9 @@ for x in range(EPOCH):
     with torch.no_grad():
         for batch, batch_items in enumerate(dev_dataloader, 1):
             # print("=============", batch*BATCH_SIZE ,'/',len(dev_pd), "===============")
-            ids1 = batch_items["input_ids_1"].to(device)
-            mask1 = batch_items["attention_mask_1"].to(device)
-            labels = batch_items["label"].to(device)
+            ids1 = batch_items["input_ids_1"].to(DEVICE)
+            mask1 = batch_items["attention_mask_1"].to(DEVICE)
+            labels = batch_items["label"].to(DEVICE)
             logits = model(ids1, mask1).squeeze(-1)
             dev_loss += loss_fn(logits, labels).item()
             correct += (torch.sigmoid(logits).round() == labels).sum().item()
