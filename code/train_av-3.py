@@ -128,4 +128,4 @@ for x in range(EPOCH):
             correct += (torch.sigmoid(logits).round() == labels).sum().item()
             dev_pred.extend(torch.sigmoid(logits).round().tolist())
             dev_labels.extend(labels.tolist())
-    print(x+1, train_loss/len(train_pd), dev_loss/len(dev_pd), roc_auc_score(dev_labels, dev_pred), f1_score(dev_labels, dev_pred))
+    print(x+1, train_loss/len(train_pd), dev_loss/len(dev_pd), roc_auc_score(dev_labels, dev_pred), f1_score(dev_labels, dev_pred, average='macro'))
