@@ -14,7 +14,7 @@ DEFAULTS = {
 
     # training
     "epochs": 100,
-    "batch_size": 1024,
+    "batch_size": 256,
     "lr": 2e-5,
     # "weight_decay": 0.01,
     # "warmup_ratio": 0.1,
