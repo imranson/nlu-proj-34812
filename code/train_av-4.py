@@ -133,7 +133,7 @@ for x in range(EPOCH):
         embs1, embs2 = model(ids1, mask1, ids2, mask2)
         embs1, embs2 = embs1.squeeze(-1), embs2.squeeze(-1)
         sim = sim_fn(embs1, embs2)
-        dist = -1 * sim
+        dist = 1 - sim
         loss = loss_fn(dist, labels)
         train_loss += loss.item()
         loss.backward()
@@ -156,10 +156,10 @@ for x in range(EPOCH):
             embs1, embs2 = model(ids1, mask1, ids2, mask2)
             embs1, embs2 = embs1.squeeze(-1), embs2.squeeze(-1)
             sim = sim_fn(embs1, embs2)
-            dist = -1 * sim
+            dist = 1 - sim
             loss = loss_fn(dist, labels)
             dev_loss += loss.item()
-            dev_pred.extend((dist >= MARGIN).tolist())
+            dev_pred.extend((dist < MARGIN).tolist())
             dev_labels.extend(labels.tolist())
     print(x+1, train_loss/len(train_pd), dev_loss/len(dev_pd), roc_auc_score(dev_labels, dev_pred), f1_score(dev_labels, dev_pred, average='macro'))
 
