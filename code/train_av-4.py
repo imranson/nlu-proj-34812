@@ -34,8 +34,7 @@ DIST_LOWER = DEFAULTS['dist_lower']
 LR = args.lr
 EPOCH = args.epochs
 DEVICE = args.device
-print(f"TRAIN_CSV={TRAIN_CSV}, DEV_CSV={DEV_CSV}, MODEL_NAME={MODEL_NAME}, BATCH_SIZE={BATCH_SIZE}, MAX_LEN={MAX_LEN}, LR={LR}, EPOCH={EPOCH}, DEVICE={DEVICE}")
-
+print(f"TRAIN_CSV={TRAIN_CSV}, DEV_CSV={DEV_CSV}, MODEL_NAME={MODEL_NAME}, MARGIN={MARGIN}, DIST_LOWER={DIST_LOWER}, BATCH_SIZE={BATCH_SIZE}, MAX_LEN={MAX_LEN}, LR={LR}, EPOCH={EPOCH}, DEVICE={DEVICE}")
 train_pd = pd.read_csv(TRAIN_CSV)
 train_pd['label']=train_pd['label'].astype(int)
 train_pd
