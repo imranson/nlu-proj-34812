@@ -17,6 +17,8 @@ parser.add_argument("--dev_csv", type=str, default=DEFAULTS['dev_csv'])
 parser.add_argument("--model_name", type=str, default=DEFAULTS['model_name'])
 parser.add_argument("--batch_size", type=int, default=DEFAULTS['batch_size'])
 parser.add_argument("--max_len", type=int, default=DEFAULTS['max_length'])
+parser.add_argument("--margin", type=float, default=DEFAULTS['margin'])
+parser.add_argument("--dist_lower", type=float, default=DEFAULTS['dist_lower'])
 parser.add_argument("--lr", type=float, default=DEFAULTS['lr'])
 parser.add_argument("--epochs", type=int, default=DEFAULTS['epochs'])
 parser.add_argument("--device", type=str, default=DEFAULTS['device'])
@@ -27,6 +29,8 @@ DEV_CSV = args.dev_csv
 MODEL_NAME = args.model_name
 BATCH_SIZE = args.batch_size
 MAX_LEN = args.max_len
+MARGIN = args.margin
+DIST_LOWER = DEFAULTS['dist_lower']
 LR = args.lr
 EPOCH = args.epochs
 DEVICE = args.device
@@ -52,6 +56,12 @@ class AVDataset(Dataset):
     def __getitem__(self, idx):
         seq1 = self.tokenizer(
             self.text_1[idx],
+            max_length=self.max_length,
+            padding="max_length",
+            truncation=True,
+            return_tensors="pt",
+        )
+        seq2 = self.tokenizer(
             self.text_2[idx],
             max_length=self.max_length,
             padding="max_length",
@@ -61,6 +71,8 @@ class AVDataset(Dataset):
         return {
             "input_ids_1": seq1["input_ids"].squeeze(0),
             "attention_mask_1": seq1["attention_mask"].squeeze(0),
+            "input_ids_2": seq2["input_ids"].squeeze(0),
+            "attention_mask_2": seq2["attention_mask"].squeeze(0),
             "label": torch.tensor(self.label[idx], dtype=torch.float),
         }
 
@@ -71,62 +83,89 @@ class CustomBERT(nn.Module):
     def __init__(self):
         super().__init__()
         self.encoder = AutoModel.from_pretrained(MODEL_NAME)
-        self.classifier = nn.Sequential(
-            nn.Linear(self.encoder.config.hidden_size, 1)
-        )
+        # self.classifier = nn.Sequential(
+        #     nn.Linear(self.encoder.config.hidden_size, 1)
+        # )
 
     def encode(self, input_ids, attention_mask):
         outputs = self.encoder(input_ids=input_ids, attention_mask=attention_mask)
         return outputs.last_hidden_state[:, 0]  # [CLS] at the beginning for each batch
 
-    def forward(self, input_ids, attention_mask):
-        bert_cls = self.encode(input_ids, attention_mask)
-        return self.classifier(bert_cls)
+    def forward(self, input_ids_1, attention_mask_1, input_ids_2, attention_mask_2): #calc dist
+        emb1 = self.encode(input_ids_1, attention_mask_1)
+        emb2 = self.encode(input_ids_2, attention_mask_2)
+        return emb1, emb2
 
-print(DEVICE)
-model = CustomBERT().to(DEVICE)
+device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu"
+print(device)
+model = CustomBERT().to(device)
 print(model)
 
-loss_fn = nn.BCEWithLogitsLoss().to(DEVICE)
+loss_fn = nn.BCEWithLogitsLoss().to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=LR)
 
 model.to(torch.float32)
 
+class ContrastiveLoss(nn.Module):
+    def __init__(self, margin):
+        super().__init__()
+        self.margin = margin
+
+    def forward(self, dist, label):
+        loss = label * (dist).pow(2) + (1 - label) * torch.clamp(
+            self.margin - dist, min=DIST_LOWER
+        ).pow(2)
+        return loss.sum()
+
+loss_fn = ContrastiveLoss(MARGIN).to(device)
+sim_fn = nn.CosineSimilarity(dim=-1)
+sim_fn.to(device)
+
 for x in range(EPOCH):
     train_loss = 0
-    correct = 0
     model.train()
-    # 1 epoch
-    for batch, batch_items in enumerate(train_dataloader, 1):
-        # print("=============", batch*BATCH_SIZE ,'/',len(train_pd), "===============")
-        ids1 = batch_items["input_ids_1"].to(DEVICE)
-        mask1 = batch_items["attention_mask_1"].to(DEVICE)
-        labels = batch_items["label"].to(DEVICE)
-        logits = model(ids1, mask1).squeeze(-1)
-        loss = loss_fn(logits, labels)
+    for batch, batch_items in enumerate (train_dataloader, 1):
+        ids1 = batch_items["input_ids_1"].to(device)
+        mask1 = batch_items["attention_mask_1"].to(device)
+        ids2 = batch_items["input_ids_2"].to(device)
+        mask2 = batch_items["attention_mask_2"].to(device)
+        labels = batch_items["label"].to(device)
+        embs1, embs2 = model(ids1, mask1, ids2, mask2)
+        embs1, embs2 = embs1.squeeze(-1), embs2.squeeze(-1)
+        sim = sim_fn(embs1, embs2)
+        dist = -1 * sim
+        loss = loss_fn(dist, labels)
         train_loss += loss.item()
-        correct += (logits.round() == labels).sum().item()
         loss.backward()
         optimizer.step()
         optimizer.zero_grad()
 
     model.eval()
+    dev_loss = 0
+    dev_labels, dev_pred = [], []
     dev_pd = pd.read_csv(DEV_CSV)
     dev_pd['label']=dev_pd['label'].astype(int)
     dev_dataloader = DataLoader(AVDataset(dev_pd['text_1'], dev_pd['text_2'], dev_pd['label']), batch_size=BATCH_SIZE, shuffle=False)
-    # print(next(iter(dev_dataloader))["input_ids_1"].shape)
-    dev_loss = 0
-    correct = 0
-    dev_pred, dev_labels = [], []
     with torch.no_grad():
-        for batch, batch_items in enumerate(dev_dataloader, 1):
-            # print("=============", batch*BATCH_SIZE ,'/',len(dev_pd), "===============")
-            ids1 = batch_items["input_ids_1"].to(DEVICE)
-            mask1 = batch_items["attention_mask_1"].to(DEVICE)
-            labels = batch_items["label"].to(DEVICE)
-            logits = model(ids1, mask1).squeeze(-1)
-            dev_loss += loss_fn(logits, labels).item()
-            correct += (torch.sigmoid(logits).round() == labels).sum().item()
-            dev_pred.extend(torch.sigmoid(logits).round().tolist())
+        for batch, batch_items in enumerate (dev_dataloader, 1):
+            ids1 = batch_items["input_ids_1"].to(device)
+            mask1 = batch_items["attention_mask_1"].to(device)
+            ids2 = batch_items["input_ids_2"].to(device)
+            mask2 = batch_items["attention_mask_2"].to(device)
+            labels = batch_items["label"].to(device)
+            embs1, embs2 = model(ids1, mask1, ids2, mask2)
+            embs1, embs2 = embs1.squeeze(-1), embs2.squeeze(-1)
+            sim = sim_fn(embs1, embs2)
+            dist = -1 * sim
+            loss = loss_fn(dist, labels)
+            dev_loss += loss.item()
+            dev_pred.extend((dist >= MARGIN).tolist())
             dev_labels.extend(labels.tolist())
     print(x+1, train_loss/len(train_pd), dev_loss/len(dev_pd), roc_auc_score(dev_labels, dev_pred), f1_score(dev_labels, dev_pred, average='macro'))
+
+
+
+
+
+
+

@@ -10,7 +10,8 @@ DEFAULTS = {
     "max_length": 50,
 
     # contrastive loss
-    # "margin": 100,
+    "margin": 0,
+    "dist_lower": 0,
 
     # training
     "epochs": 100,
