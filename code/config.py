@@ -11,7 +11,7 @@ DEFAULTS = {
 
     # contrastive loss
     "margin": 0,
-    "dist_lower": 0,
+    "dist_lower": -1,
 
     # training
     "epochs": 100,
