@@ -1,7 +1,7 @@
 #!/bin/bash --login
 ### Choose ONE of the following partitions depending on your permitted access
 
-#SBATCH -p gpuA              
+#SBATCH -p gpuL            
 ### Required flags
 #SBATCH -G 1                 # (or --gpus=N) Number of GPUs 
 #SBATCH -t 4-0               # Wallclock timelimit (1-0 is one day, 4-0 is max permitted)
@@ -25,6 +25,8 @@ echo "Job is using $SLURM_GPUS GPU(s) with ID(s) $CUDA_VISIBLE_DEVICES and $SLUR
 python3 -c "import torch;
 print(f'torch cuda is available: {torch.cuda.is_available()}')"
 
+python code/train_av-4.py --max_len 50 --epochs 300 --batch_size 640 --lr 1e-3
+python code/train_av-4.py --max_len 50 --epochs 300 --batch_size 640 --lr 1e-4
 python code/train_av-4.py --max_len 50 --epochs 300 --batch_size 640 --lr 1e-5
 
 module purge
