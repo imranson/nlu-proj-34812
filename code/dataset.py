@@ -58,7 +58,7 @@ def load_fasttext_embeddings(embedding_path, vocabulary, embedding_dim):
     embeddings = torch.zeros(len(vocabulary), embedding_dim)
     embedding_indices = []
     with open(embedding_path, "r", encoding="utf-8") as f:
-        next(f)  # Skip header line
+        next(f)
         for line in f:
             parts = line.strip().split()
             word = parts[0]

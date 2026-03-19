@@ -10,13 +10,16 @@ from model import SiameseBiLSTM
 import pandas as pd
 from evaluate import evaluate
 
-def compute_loss(outputs, batch, loss):
-    # implement BCE loss. 
+def compute_loss(outputs, batch, loss, pos_weight=1.0):
+    labels = batch["label"].unsqueeze(1).to(outputs.device).float()
     if loss == "bce":
-        criterion = torch.nn.BCELoss()
+        weights = torch.where(labels == 1, 
+                             torch.tensor(pos_weight, device=outputs.device), 
+                             torch.tensor(1.0, device=outputs.device))
+        criterion = torch.nn.BCELoss(weight=weights)
     else:
         criterion = torch.nn.BCEWithLogitsLoss()
-    return criterion(outputs, batch["label"].unsqueeze(1).to(outputs.device).float())
+    return criterion(outputs, labels)
 
 def convert_to_serialisable(obj):
     if isinstance(obj, np.floating):
@@ -72,15 +75,16 @@ def train(args):
         for step, batch in enumerate(train_loader, 1):
             # Forward pass
             outputs = model(batch["indices_1"].to(device), batch["length_1"].to(device), batch["indices_2"].to(device), batch["length_2"].to(device))
-            loss = compute_loss(outputs, batch, args.loss)
+            loss = compute_loss(outputs, batch, args.loss, args.pos_weight)
 
             # Backward pass
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), args.max_grad_norm)
+            if args.max_grad_norm > 0:
+                torch.nn.utils.clip_grad_norm_(model.parameters(), args.max_grad_norm)
             optimizer.step()
             optimizer.zero_grad()
             running_loss += loss.item()
-            if step % args.log_steps == 0:
+            if step % 200 == 0:
                 avg = running_loss / step
                 print(f"  Epoch {epoch} | Step {step}/{len(train_loader)} | Loss {avg:.4f}")
 
@@ -116,17 +120,21 @@ def train(args):
                 save_path,
             )
             print(f"  ✓ Saved best model (F1={best_f1:.4f}) → {save_path}")
-
-        if epoch > 0 and history[-1]["val_f1"] <= history[-2]["val_f1"]:
+            patience_counter = 0
+        else:
             patience_counter += 1
-            print(f"  No improvement in F1. Patience counter: {patience_counter}/4")
-            if patience_counter >= 4:
+            print(f"  No improvement in F1. Patience counter: {patience_counter}/5")
+            if patience_counter >= 5:
                 print("  Early stopping triggered.")
                 break
-        else:            
-            patience_counter = 0
 
-    ckpt_name = f"siamese_bilstm_lr{args.lr}_bs{args.batch_size}_ep{args.epochs}"
+    ckpt_name = (
+        f"bilstm_attn_deephead"
+        f"_lr{args.lr}"
+        f"_hd{args.hidden_dim}"
+        f"_do{args.dropout}"
+    )
+
     results_path = os.path.join(args.output_dir, f"{ckpt_name}_results.json")
     results = {
         "best_f1": best_f1,
@@ -149,9 +157,11 @@ def parse_args():
     p.add_argument("--lowercase", action="store_true", default=DEFAULTS["lowercase"])
 
     p.add_argument("--hidden_dim", type=int, default=DEFAULTS["hidden_dim"])
+    p.add_argument("--embedding_dim", type=int, default=DEFAULTS["embedding_dim"])
     p.add_argument("--num_layers", type=int, default=DEFAULTS["num_layers"])
     p.add_argument("--lstm_dropout", type=float, default=DEFAULTS["lstm_dropout"])
     p.add_argument("--freeze_embeddings", action="store_true", default=DEFAULTS["freeze_embeddings"])
+    p.add_argument("--pos_weight", type=float, default=DEFAULTS["pos_weight"])
 
     p.add_argument("--epochs", type=int, default=DEFAULTS["epochs"])
     p.add_argument("--batch_size", type=int, default=DEFAULTS["batch_size"])
@@ -164,6 +174,7 @@ def parse_args():
     p.add_argument("--device", type=str, default=DEFAULTS["device"])
     p.add_argument("--num_workers", type=int, default=DEFAULTS["num_workers"])
     p.add_argument("--output_dir", type=str, default=DEFAULTS["output_dir"])
+    p.add_argument("--seed", type=int, default=DEFAULTS["seed"])
 
     return p.parse_args()
 
