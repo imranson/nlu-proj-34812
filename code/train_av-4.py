@@ -24,6 +24,7 @@ parser.add_argument("--lr", type=float, default=DEFAULTS['lr'])
 parser.add_argument("--epochs", type=int, default=DEFAULTS['epochs'])
 parser.add_argument("--device", type=str, default=DEFAULTS['device'])
 parser.add_argument("--output_dir", type=str, default=DEFAULTS['output_dir'])
+parser.add_argument("--save_model", action="store_true", default=DEFAULTS['save_model'])
 args = parser.parse_args()
 
 TRAIN_CSV = args.train_csv
@@ -37,6 +38,7 @@ LR = args.lr
 EPOCH = args.epochs
 DEVICE = args.device
 OUTPUT_DIR = args.output_dir
+SAVE_MODEL = args.save_model
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 model_short = MODEL_NAME.split("/")[-1]
@@ -132,6 +134,7 @@ train_hist = []
 test_hist = []
 auc_hist = []
 f1_hist = []
+best_auc = 0.0
 for x in range(EPOCH):
     train_loss = 0
     model.train()
@@ -177,6 +180,10 @@ for x in range(EPOCH):
     auc_hist.append(roc_auc_score(dev_labels, dev_pred))
     f1_hist.append(f1_score(dev_labels, dev_pred, average='macro'))
     print(x+1, train_hist[-1], test_hist[-1],auc_hist[-1],f1_hist[-1])
+    if SAVE_MODEL and auc_hist[-1] > best_auc:
+        best_auc = auc_hist[-1]
+        model_path = os.path.join(OUTPUT_DIR, f"{RUN_ID}_model.pt")
+        torch.save(model.state_dict(), model_path)
 
 history_df = pd.DataFrame({
     "epoch": list(range(1, EPOCH + 1)),

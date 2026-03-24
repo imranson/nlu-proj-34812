@@ -27,4 +27,5 @@ DEFAULTS = {
     # "num_workers": 0,
     # "log_steps": 100,
     "output_dir": "checkpoints/av_siamese",
+    "save_model": False,
 }
