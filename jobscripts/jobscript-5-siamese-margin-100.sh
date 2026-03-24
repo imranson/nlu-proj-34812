@@ -1,7 +1,7 @@
 #!/bin/bash --login
 ### Choose ONE of the following partitions depending on your permitted access
 
-#SBATCH -p gpuA              
+#SBATCH -p gpuL              
 ### Required flags
 #SBATCH -G 1                 # (or --gpus=N) Number of GPUs 
 #SBATCH -t 4-0               # Wallclock timelimit (1-0 is one day, 4-0 is max permitted)
