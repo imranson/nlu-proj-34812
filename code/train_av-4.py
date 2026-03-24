@@ -120,6 +120,10 @@ loss_fn = ContrastiveLoss(MARGIN).to(device)
 sim_fn = nn.CosineSimilarity(dim=-1)
 sim_fn.to(device)
 
+train_hist = []
+test_hist = []
+auc_hist = []
+f1_hist = []
 for x in range(EPOCH):
     train_loss = 0
     model.train()
@@ -160,11 +164,9 @@ for x in range(EPOCH):
             dev_loss += loss.item()
             dev_pred.extend((dist < MARGIN).tolist())
             dev_labels.extend(labels.tolist())
-    print(x+1, train_loss/len(train_pd), dev_loss/len(dev_pd), roc_auc_score(dev_labels, dev_pred), f1_score(dev_labels, dev_pred, average='macro'))
-
-
-
-
-
-
+    train_hist.append(train_loss/len(train_pd))
+    test_hist.append(dev_loss/len(dev_pd))
+    auc_hist.append(roc_auc_score(dev_labels, dev_pred))
+    f1_hist.append(f1_score(dev_labels, dev_pred, average='macro'))
+    print(x+1, train_hist[-1], test_hist[-1],auc_hist[-1],f1_hist[-1])
 
