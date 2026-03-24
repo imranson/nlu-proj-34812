@@ -23,7 +23,7 @@ DEFAULTS = {
     # "fp16": True,
 
     # runtime
-    "device": "cuda" if torch.cuda.is_available() else "cpu",
+    "device": torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else "cpu",
     # "num_workers": 0,
     # "log_steps": 100,
     "output_dir": "checkpoints/av_siamese",
