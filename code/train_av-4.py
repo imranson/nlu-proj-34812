@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
+import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModel
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
@@ -22,6 +23,7 @@ parser.add_argument("--dist_lower", type=float, default=DEFAULTS['dist_lower'])
 parser.add_argument("--lr", type=float, default=DEFAULTS['lr'])
 parser.add_argument("--epochs", type=int, default=DEFAULTS['epochs'])
 parser.add_argument("--device", type=str, default=DEFAULTS['device'])
+parser.add_argument("--output_dir", type=str, default=DEFAULTS['output_dir'])
 args = parser.parse_args()
 
 TRAIN_CSV = args.train_csv
@@ -34,6 +36,12 @@ DIST_LOWER = DEFAULTS['dist_lower']
 LR = args.lr
 EPOCH = args.epochs
 DEVICE = args.device
+OUTPUT_DIR = args.output_dir
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+model_short = MODEL_NAME.split("/")[-1]
+RUN_ID = f"{model_short}_ep{EPOCH}_bs{BATCH_SIZE}_lr{LR}_ml{MAX_LEN}_m{MARGIN}_dl{DIST_LOWER}"
+
 print(f"TRAIN_CSV={TRAIN_CSV}, DEV_CSV={DEV_CSV}, MODEL_NAME={MODEL_NAME}, MARGIN={MARGIN}, DIST_LOWER={DIST_LOWER}, BATCH_SIZE={BATCH_SIZE}, MAX_LEN={MAX_LEN}, LR={LR}, EPOCH={EPOCH}, DEVICE={DEVICE}")
 train_pd = pd.read_csv(TRAIN_CSV)
 train_pd['label']=train_pd['label'].astype(int)
@@ -169,4 +177,32 @@ for x in range(EPOCH):
     auc_hist.append(roc_auc_score(dev_labels, dev_pred))
     f1_hist.append(f1_score(dev_labels, dev_pred, average='macro'))
     print(x+1, train_hist[-1], test_hist[-1],auc_hist[-1],f1_hist[-1])
+
+history_df = pd.DataFrame({
+    "epoch": list(range(1, EPOCH + 1)),
+    "train_loss": train_hist,
+    "dev_loss": test_hist,
+    "auc": auc_hist,
+    "f1": f1_hist,
+})
+history_df.to_csv(os.path.join(OUTPUT_DIR, f"{RUN_ID}_history.csv"), index=False)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+epochs = history_df["epoch"]
+ax1.plot(epochs, history_df["train_loss"], label="Train Loss")
+ax1.plot(epochs, history_df["dev_loss"], label="Dev Loss")
+ax1.set_xlabel("Epoch")
+ax1.set_ylabel("Loss")
+ax1.set_title("Loss")
+ax1.legend()
+ax2.plot(epochs, history_df["auc"], label="AUC")
+ax2.plot(epochs, history_df["f1"], label="F1")
+ax2.set_xlabel("Epoch")
+ax2.set_ylabel("Score")
+ax2.set_title("Metrics")
+ax2.legend()
+fig.suptitle(RUN_ID)
+fig.tight_layout()
+fig.savefig(os.path.join(OUTPUT_DIR, f"{RUN_ID}_history.png"), dpi=150)
+print(f"Saved outputs to {OUTPUT_DIR}/ with prefix {RUN_ID}")
 
