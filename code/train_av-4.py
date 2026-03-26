@@ -192,6 +192,7 @@ history_df = pd.DataFrame({
     "auc": auc_hist,
     "f1": f1_hist,
 })
+history_df["best_auc"] = history_df["auc"] == history_df["auc"].max()
 history_df.to_csv(os.path.join(OUTPUT_DIR, f"{RUN_ID}_history.csv"), index=False)
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
@@ -207,6 +208,14 @@ ax2.plot(epochs, history_df["f1"], label="F1")
 ax2.set_xlabel("Epoch")
 ax2.set_ylabel("Score")
 ax2.set_title("Metrics")
+best_idx = history_df["auc"].idxmax()
+best_epoch = int(history_df.loc[best_idx, "epoch"])
+best_auc_val = history_df["auc"].max()
+ax2.axvline(best_epoch, color="gray", linestyle="--", alpha=0.5)
+ax2.annotate(f"Best AUC: {best_auc_val:.4f} (ep {best_epoch})",
+             xy=(best_epoch, best_auc_val), xytext=(5, -15),
+             textcoords="offset points", fontsize=9,
+             arrowprops=dict(arrowstyle="->", color="gray"))
 ax2.legend()
 fig.suptitle(RUN_ID)
 fig.tight_layout()
