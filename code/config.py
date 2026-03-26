@@ -28,4 +28,9 @@ DEFAULTS = {
     # "log_steps": 100,
     "output_dir": "checkpoints/av_siamese",
     "save_model": False,
+
+    ######## TESTING
+    "test_csv": "trial_data/AV_trial.csv",
+    "model_path": "checkpoints/av_siamese/deberta-v3-xsmall_ep2_bs512_lr0.002_ml2_m1.0_dl0_model.pt",
+
 }
