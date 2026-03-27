@@ -1,17 +1,16 @@
 import argparse
-import json
 import os
-import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModel
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
+from sklearn.metrics import f1_score, roc_auc_score
 
 from config import DEFAULTS
 
+# parse args or use default
 parser = argparse.ArgumentParser()
 parser.add_argument("--train_csv", type=str, default=DEFAULTS['train_csv'])
 parser.add_argument("--dev_csv", type=str, default=DEFAULTS['dev_csv'])
@@ -44,11 +43,15 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 model_short = MODEL_NAME.split("/")[-1]
 RUN_ID = f"{model_short}_ep{EPOCH}_bs{BATCH_SIZE}_lr{LR}_ml{MAX_LEN}_m{MARGIN}_dl{DIST_LOWER}"
 
+# print parameters
 print(f"TRAIN_CSV={TRAIN_CSV}, DEV_CSV={DEV_CSV}, MODEL_NAME={MODEL_NAME}, MARGIN={MARGIN}, DIST_LOWER={DIST_LOWER}, BATCH_SIZE={BATCH_SIZE}, MAX_LEN={MAX_LEN}, LR={LR}, EPOCH={EPOCH}, DEVICE={DEVICE}")
+
+# load train file
 train_pd = pd.read_csv(TRAIN_CSV)
 train_pd['label']=train_pd['label'].astype(int)
 train_pd
 
+# set up train dataset
 class AVDataset(Dataset):
     def __init__(self, text_1, text_2, label, max_length=MAX_LEN, transform=None, target_transform=None):
         self.text_1 = text_1
@@ -85,9 +88,11 @@ class AVDataset(Dataset):
             "label": torch.tensor(self.label[idx], dtype=torch.float),
         }
 
+# load train dataset
 train_dataloader = DataLoader(AVDataset(train_pd['text_1'], train_pd['text_2'], train_pd['label']), batch_size=BATCH_SIZE, shuffle=True)
 print(next(iter(train_dataloader))["input_ids_1"].shape)
 
+# set up model
 class CustomBERT(nn.Module):
     def __init__(self):
         super().__init__()
@@ -113,8 +118,10 @@ print(model)
 loss_fn = nn.BCEWithLogitsLoss().to(device)
 optimizer = torch.optim.AdamW(model.parameters(), lr=LR)
 
+# specify float 32 for adequate precision
 model.to(torch.float32)
 
+# contrastive loss
 class ContrastiveLoss(nn.Module):
     def __init__(self, margin):
         super().__init__()
@@ -130,12 +137,14 @@ loss_fn = ContrastiveLoss(MARGIN).to(device)
 sim_fn = nn.CosineSimilarity(dim=-1)
 sim_fn.to(device)
 
+# history tracking for model vis and selection
 train_hist = []
 test_hist = []
 auc_hist = []
 f1_hist = []
 best_auc = 0.0
 for x in range(EPOCH):
+    # training loop
     train_loss = 0
     model.train()
     for batch, batch_items in enumerate (train_dataloader, 1):
@@ -154,6 +163,7 @@ for x in range(EPOCH):
         optimizer.step()
         optimizer.zero_grad()
 
+    # eval loop
     model.eval()
     dev_loss = 0
     dev_labels, dev_pred = [], []
@@ -175,6 +185,8 @@ for x in range(EPOCH):
             dev_loss += loss.item()
             dev_pred.extend((dist < MARGIN).tolist())
             dev_labels.extend(labels.tolist())
+
+    # tracking and saving
     train_hist.append(train_loss/len(train_pd))
     test_hist.append(dev_loss/len(dev_pd))
     auc_hist.append(roc_auc_score(dev_labels, dev_pred))
@@ -185,6 +197,7 @@ for x in range(EPOCH):
         model_path = os.path.join(OUTPUT_DIR, f"{RUN_ID}_model.pt")
         torch.save(model.state_dict(), model_path)
 
+# make table for reference
 history_df = pd.DataFrame({
     "epoch": list(range(1, EPOCH + 1)),
     "train_loss": train_hist,
@@ -195,6 +208,7 @@ history_df = pd.DataFrame({
 history_df["best_auc"] = history_df["auc"] == history_df["auc"].max()
 history_df.to_csv(os.path.join(OUTPUT_DIR, f"{RUN_ID}_history.csv"), index=False)
 
+# make graph and save
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
 epochs = history_df["epoch"]
 ax1.plot(epochs, history_df["train_loss"], label="Train Loss")

@@ -1,17 +1,13 @@
 import argparse
-import json
-import os
-import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModel
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score
 
 from config import DEFAULTS
 
+# parse args or use default
 parser = argparse.ArgumentParser()
 parser.add_argument("--test_csv", type=str, default=DEFAULTS['test_csv'])
 parser.add_argument("--model_name", type=str, default=DEFAULTS['model_name'])
@@ -34,12 +30,15 @@ DIST_LOWER = args.dist_lower
 DEVICE = args.device
 OUTPUT_PATH = args.output_path
 
+# print parameters
 print(f"TEST_CSV={TEST_CSV}, MODEL_NAME={MODEL_NAME}, MODEL_PATH={MODEL_PATH}, BATCH_SIZE={BATCH_SIZE}, MAX_LEN={MAX_LEN}, DIST_LOWER={DIST_LOWER}, MARGIN={MARGIN}, OUTPUT_PATH={OUTPUT_PATH}, DEVICE={DEVICE}")
 
+# load test file
 test_pd = pd.read_csv(TEST_CSV)
 if 'label' in test_pd.columns:
     test_pd.drop(columns=['label'], inplace=True)
 
+# set up test dataset
 class AVDataset(Dataset):
     def __init__(self, text_1, text_2, max_length=MAX_LEN, transform=None, target_transform=None):
         self.text_1 = text_1
@@ -74,16 +73,15 @@ class AVDataset(Dataset):
             "attention_mask_2": seq2["attention_mask"].squeeze(0),
         }
 
+# load test dataset
 test_dataloader = DataLoader(AVDataset(test_pd['text_1'], test_pd['text_2']), batch_size=BATCH_SIZE, shuffle=False)
 print(next(iter(test_dataloader))["input_ids_1"].shape)
 
+# set up model
 class CustomBERT(nn.Module):
     def __init__(self):
         super().__init__()
         self.encoder = AutoModel.from_pretrained(MODEL_NAME)
-        # self.classifier = nn.Sequential(
-        #     nn.Linear(self.encoder.config.hidden_size, 1)
-        # )
 
     def encode(self, input_ids, attention_mask):
         outputs = self.encoder(input_ids=input_ids, attention_mask=attention_mask)
@@ -103,8 +101,10 @@ print(model)
 sim_fn = nn.CosineSimilarity(dim=-1)
 sim_fn.to(device)
 
+# specify float 32 for adequate precision
 model.to(torch.float32)
 
+# prediction
 model.eval()
 test_pred = []
 with torch.no_grad():
@@ -120,6 +120,7 @@ with torch.no_grad():
         dist = 1 - sim
         test_pred.extend((dist < MARGIN).tolist())
 
+# save
 to_output = test_pd
 to_output['label'] = test_pred
 to_output['label'] = to_output['label'].astype(int)
