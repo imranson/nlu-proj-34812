@@ -122,4 +122,4 @@ Any single piece of text longer than 512 tokens (tokenized by the same model) wi
 
 <!-- Any other information that would be useful for other people to know. -->
 
-The hyperparameters were determined by manual experimentation with different values. With more time, better performance is probably achievable via additional hyperparameters e.g. dropout, weight decay etc.
+The hyperparameters were determined by manual experimentation with different values. With more time, better generalization is probably achievable via additional hyperparameters e.g. dropout, weight decay etc.
