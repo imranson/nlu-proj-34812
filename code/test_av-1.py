@@ -95,7 +95,7 @@ class CustomBERT(nn.Module):
 device = DEVICE
 print(DEVICE)
 model = CustomBERT().to(device)
-model.load_state_dict(torch.load(MODEL_PATH, weights_only=True))
+model.load_state_dict(torch.load(MODEL_PATH, map_location=device, weights_only=True))
 print(model)
 
 sim_fn = nn.CosineSimilarity(dim=-1)
