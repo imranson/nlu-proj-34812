@@ -9,7 +9,7 @@ repo: https://github.com/imranson/nlu-proj-34812
 
 ---
 
-# Model Card for q12628ct-username2-AV
+# Model Card for q12628ct-u93792gc-m13447tk-AV
 
 <!-- Provide a quick summary of what the model is/does. -->
 
@@ -56,20 +56,20 @@ The document embeddings are produced using a BERT model variant called microsoft
 <!-- This is a summary of the values of hyperparameters used in training the model. -->
 
 
-      - learning_rate: 2e-05
+      - learning_rate: 1e-05
       - train_batch_size: 16
       - eval_batch_size: 16
-      - seed: 42
-      - num_epochs: 10
+      - seed: None
+      - num_epochs: 300
 
 #### Speeds, Sizes, Times
 
 <!-- This section provides information about how roughly how long it takes to train the model and the size of the resulting model. -->
 
 
-      - overall training time: 5 hours
-      - duration per training epoch: 30 minutes
-      - model size: 300MB
+      - overall training time: 2 days 7 hours
+      - duration per training epoch: 11 minutes
+      - model size: 238MB
 
 ## Evaluation
 
@@ -81,30 +81,31 @@ The document embeddings are produced using a BERT model variant called microsoft
 
 <!-- This should describe any evaluation data used (e.g., the development/validation set provided). -->
 
-A subset of the development set provided, amounting to 2K pairs.
+A subset of the development set provided, amounting to 6K pairs.
 
 #### Metrics
 
 <!-- These are the evaluation metrics being used. -->
 
 
-      - Precision
-      - Recall
-      - F1-score
-      - Accuracy
+      - Precision: 0.7653
+      - Recall: 0.8920
+      - Macro F1-score: 0.8238
+      - Accuracy: 0.8054
+      - AUC: 0.8037
 
 ### Results
 
-The model obtained an F1-score of 67% and an accuracy of 70%.
+The model obtained a macro F1-score of 0.8238 and AUC of 0.8037. Macro F1 equally weighs the F1 score from each class. The classes in the dev set are roughly balanced. 
 
 ## Technical Specifications
 
 ### Hardware
 
 
-      - RAM: at least 16 GB
-      - Storage: at least 2GB,
-      - GPU: V100
+      - RAM: at least 15 GB
+      - Storage: at least 300MB,
+      - GPU: T5
 
 ### Software
 
