@@ -2,6 +2,7 @@
 __pycache__
 .obsidian
 *.pt
+coursework-description.pdf
 
 /training_data/*
 !/training_data/.gitkeep
