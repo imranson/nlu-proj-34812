@@ -117,7 +117,7 @@ The model obtained a macro F1-score of 0.8033 and AUC of 0.8037. Macro F1 equall
       - Storage: at least 300MB,
       - GPU: T5
     
-    Batch size can be reduced to use less RAM and VRAM.
+    Batch size can be varied to control VRAM usage and execution time.
 
 ### Software
 

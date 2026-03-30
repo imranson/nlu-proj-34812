@@ -124,4 +124,5 @@ with torch.no_grad():
 to_output = test_pd
 to_output['label'] = test_pred
 to_output['label'] = to_output['label'].astype(int)
-to_output.to_csv(OUTPUT_PATH, index=False)
+to_output.rename(columns={'label':'prediction'}, inplace=True)
+to_output['prediction'].to_csv(OUTPUT_PATH, index=False)
