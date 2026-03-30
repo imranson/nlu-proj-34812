@@ -36,7 +36,7 @@ The document embeddings are produced using a BERT model variant called microsoft
 
 <!-- Provide links where applicable. -->
 
-- **Repository:** https://huggingface.co/microsoft/deberta-v3-base
+- **Repository:** https://huggingface.co/microsoft/deberta-v3-xsmall
 - **Paper or documentation:** https://doi.org/10.48550/arXiv.2111.09543
 
 ## Training Details
@@ -69,7 +69,7 @@ The document embeddings are produced using a BERT model variant called microsoft
 
       - overall training time: 2 days 7 hours
       - duration per training epoch: 11 minutes
-      - model size: 238MB
+      - model size: 283MB
 
 ## Evaluation
 
@@ -81,37 +81,51 @@ The document embeddings are produced using a BERT model variant called microsoft
 
 <!-- This should describe any evaluation data used (e.g., the development/validation set provided). -->
 
-A subset of the development set provided, amounting to 6K pairs.
+Development set and trial dataset provided with the assignment, amounting to 6K and 50 pairs respectively.
 
 #### Metrics
 
 <!-- These are the evaluation metrics being used. -->
 
 
+    Dev set:
       - Precision: 0.7653
       - Recall: 0.8920
-      - Macro F1-score: 0.8238
+      - Macro F1-score: 0.8033
       - Accuracy: 0.8054
       - AUC: 0.8037
+    
+    Trial set:
+      - Precision: 0.8889
+      - Recall: 0.9600
+      - Macro F1-score: 0.9199
+      - Accuracy: 0.9200
+      - AUC: 0.9200
 
 ### Results
 
-The model obtained a macro F1-score of 0.8238 and AUC of 0.8037. Macro F1 equally weighs the F1 score from each class. The classes in the dev set are roughly balanced. 
+The model obtained a macro F1-score of 0.8033 and AUC of 0.8037. Macro F1 equally weighs the F1 score from each class. The classes in the dev set are roughly balanced. 
 
 ## Technical Specifications
 
 ### Hardware
 
 
-      - RAM: at least 15 GB
+    For evaluation with the default demo code configurations,
+      - RAM: at least 4GB,
+      - VRAM: at least 4GB,
       - Storage: at least 300MB,
       - GPU: T5
+    
+    Batch size can be reduced to use less RAM and VRAM.
 
 ### Software
 
 
-      - Transformers 4.18.0
-      - Pytorch 1.11.0+cu113
+    Tested on:
+      - Transformers 5.0.0
+      - Pytorch 2.10.0+cu128
+      - Pandas 2.2.2
 
 ## Bias, Risks, and Limitations
 
@@ -123,4 +137,4 @@ Any single piece of text longer than 512 tokens (tokenized by the same model) wi
 
 <!-- Any other information that would be useful for other people to know. -->
 
-The hyperparameters were determined by manual experimentation with different values. With more time, better generalization is probably achievable via additional hyperparameters e.g. dropout, weight decay etc.
+The hyperparameters were determined by manual experimentation with different values. With more time, better generalization is probably achievable via tuning and additional hyperparameters e.g. dropout, weight decay etc.
