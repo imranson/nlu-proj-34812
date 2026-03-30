@@ -137,4 +137,4 @@ Any single piece of text longer than 512 tokens (tokenized by the same model) wi
 
 <!-- Any other information that would be useful for other people to know. -->
 
-The hyperparameters were determined by manual experimentation with different values. With more time, better generalization is probably achievable via tuning and additional hyperparameters e.g. dropout, weight decay etc.
+The hyperparameters were determined by manual experimentation with different values, using A100 80GB GPUs. A total of approximately 10 experiments have been done before committing to the above Siamese architecture, with a total runtime of at least 20 days. With more time, better generalization is probably achievable via tuning and additional hyperparameters e.g. dropout, weight decay etc.
