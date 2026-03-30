@@ -40,6 +40,10 @@ Given two text sequences, determine whether both were written by the same author
 
 ## Attribution
 All training, development, and test data were provided as part of the COMP34812 AV shared task (closed track). No external datasets were used in accordance with the closed-track rules.
+
+For solution C, below are the relevant sources for the BERT variant used:
+Base model repo: https://huggingface.co/microsoft/deberta-v3-xsmall
+Base model paper: https://doi.org/10.48550/arXiv.2111.09543
 ## Model Artefacts
 All model files for Solution A are under 10 MB total (~1.6 MB) and are included directly in the submission. No cloud-hosted models are required.
 
