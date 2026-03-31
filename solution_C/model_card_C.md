@@ -26,7 +26,7 @@ This model is a Siamese model that implements contrastive loss. A Siamese model 
 
 The document embeddings are produced using a BERT model variant called microsoft/deberta-v3-xsmall on Hugging Face. For each sample, the 2 texts are fed into the model separately. The 384-dimension CLS tokens from the 2 outputs are used to calculate distance and perform classification. This model was fine-tuned on 27K pairs of texts provided with this assignment.
 
-- **Developed by:** Tham Chun Shen
+- **Developed by:** Tham Chun Shen, Timothy Kirathe, and Gabriel Connors
 - **Language(s):** English
 - **Model type:** Supervised
 - **Model architecture:** Transformers
@@ -115,7 +115,7 @@ The model obtained a macro F1-score of 0.8033 and AUC of 0.8037. Macro F1 equall
       - RAM: at least 4GB,
       - VRAM: at least 4GB,
       - Storage: at least 300MB,
-      - GPU: T5
+      - GPU: T4
     
     Batch size can be varied to control VRAM usage and execution time.
 
