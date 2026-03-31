@@ -2,17 +2,16 @@
 language: en
 license: cc-by-4.0
 tags:
-- text-classification
-- authorship-verification
-repo: https://github.com/username/project_name
+  - text-classification
+  - authorship-verification
+repo: https://github.com/imranson/nlu-proj-34812
 ---
 
-# Model Card for m13447tk-q12628ct-AV
+# Model Card for q12628ct-u93792gc-m13447tk-AV
 
 <!-- Provide a quick summary of what the model is/does. -->
 
 A traditional machine learning model for Authorship Verification (AV) that determines whether two text sequences were written by the same author, using handcrafted stylometric features with a Gradient Boosting classifier.
-
 
 ## Model Details
 
@@ -22,7 +21,7 @@ A traditional machine learning model for Authorship Verification (AV) that deter
 
 This model extracts stylometric (writing style) features from pairs of texts, including punctuation usage rates, vocabulary richness measures (type-token ratio, hapax legomena, Yule's K), function word frequencies, text structure statistics (sentence/word length distributions), and pairwise similarity measures (Normalised Compression Distance, Burrows' Delta, Keselj character n-gram dissimilarity). TF-IDF cosine similarities from character n-grams (2-5) and word n-grams (1-2) are also computed. The resulting feature vector is scaled with StandardScaler and classified by a Gradient Boosting model.
 
-- **Developed by:** Timothy Kirathe and Tham Chun Shen
+- **Developed by:** Timothy Kirathe (m13447tk)
 - **Language(s):** English
 - **Model type:** Supervised (Traditional Machine Learning)
 - **Model architecture:** Gradient Boosting Classifier with stylometric feature engineering
@@ -51,7 +50,6 @@ Approximately 27,643 pairs of text sequences from the COMP34812 AV shared task (
 
 <!-- This is a summary of the values of hyperparameters used in training the model. -->
 
-
       - n_estimators: 350
       - max_depth: 5
       - learning_rate: 0.1
@@ -65,7 +63,6 @@ Approximately 27,643 pairs of text sequences from the COMP34812 AV shared task (
 #### Speeds, Sizes, Times
 
 <!-- This section provides information about how roughly how long it takes to train the model and the size of the resulting model. -->
-
 
       - Overall training time: approximately 10-15 minutes on CPU
       - Model size: 1.6 MB total (5 artefact files)
@@ -87,7 +84,6 @@ Approximately 5,993 pairs from the COMP34812 AV development set.
 
 <!-- These are the evaluation metrics being used. -->
 
-
       - Accuracy
       - F1-score (macro, weighted)
       - Precision (macro)
@@ -95,13 +91,8 @@ Approximately 5,993 pairs from the COMP34812 AV development set.
 
 ### Results
 
-The model achieved the following on the development set:
-      - Accuracy: 0.6905
-      - F1 (macro): 0.6901
-      - F1 (weighted): 0.6898
-      - Precision (macro): 0.6931
-      - Recall (macro): 0.6915
-      
+The model achieved the following on the development set: - Accuracy: 0.6905 - F1 (macro): 0.6901 - F1 (weighted): 0.6898 - Precision (macro): 0.6931 - Recall (macro): 0.6915
+
       Per-class performance:
       - Different Author (0): Precision 0.6651, Recall 0.7419, F1 0.7014
       - Same Author (1): Precision 0.7210, Recall 0.6410, F1 0.6787
@@ -110,13 +101,11 @@ The model achieved the following on the development set:
 
 ### Hardware
 
-
       - RAM: 4 GB minimum
       - Storage: less than 10 MB for model artefacts
       - GPU: not required (CPU-only)
 
 ### Software
-
 
       - Python 3.10+
       - scikit-learn
