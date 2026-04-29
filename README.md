@@ -47,4 +47,4 @@ Base model paper: https://doi.org/10.48550/arXiv.2111.09543
 ## Model Artefacts
 All model files for Solution A are under 10 MB total (~1.6 MB) and are included directly in the submission. No cloud-hosted models are required.
 
-For Solution C, download trained model from https://livemanchesterac-my.sharepoint.com/:u:/g/personal/chun_tham_student_manchester_ac_uk/IQBlmeb7lWvaRqApkmkxD1VPATbhm88zhEfKLNnH1m_EY4I?e=AyjL9H (~283 MB total).
+For Solution C, download trained model from https://livemanchesterac-my.sharepoint.com/:u:/g/personal/chun_tham_student_manchester_ac_uk/IQBlmeb7lWvaRqApkmkxD1VPAVmw38ljIVMUIEy7SIB6G3o (~283 MB total).
